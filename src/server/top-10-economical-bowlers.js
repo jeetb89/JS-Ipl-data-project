@@ -1,74 +1,50 @@
-const csvTOJSON =require("../util.js");
+const csvTOJSON = require("../util.js");
 const fs = require("fs");
 
 const matchesFilePath = "../data/matches.csv";
-const deliveriesFilepath = "../data/deliveries.csv"
-const filepath="../public/output/top10EconomicalBowlers.json"
+const deliveriesFilePath = "../data/deliveries.csv";
+const filepath = "../public/output/top10EconomicalBowlers.json";
 
-function top10EconomicBowlersIn2015(){
+function top10EconomicBowlersIn2015() {
 
-    const matchData=csvTOJSON(matchesFilePath);
+  const matchData = csvTOJSON(matchesFilePath);
 
-   
-        let idSet = [];
-        for(let index=0;index<matchData.length;index++){
-            if(matchData[index].season=="2015"){
-                idSet.push(matchData[index].id);
-            }
-        }
-        // console.log(idSet);
-      const deleveriesData  =csvTOJSON(deliveriesFilepath);
-            let runConceded = {};
-           let balls ={};
-            for(let index =0; index<deleveriesData.length;index++){
-                if(idSet.includes(deleveriesData[index].match_id)){
-                    if(!runConceded[deleveriesData[index].bowler]){
-                        runConceded[deleveriesData[index].bowler]=(Number(deleveriesData[index].wide_runs)+Number(deleveriesData[index].noball_runs)+Number(deleveriesData[index].batsman_runs));
-                        //if(deleveriesData[index].wide_runs==0 && deleveriesData[index].noball_runs==0){
-                             balls[deleveriesData[index].bowler]=1;
-                        // }else{
-                        //     balls[deleveriesData[index].bowler]=0;
-                        // }
-                    }else{
-                        runConceded[deleveriesData[index].bowler]+=(Number(deleveriesData[index].wide_runs)+Number(deleveriesData[index].noball_runs)+Number(deleveriesData[index].batsman_runs));
-                       // if(deleveriesData[index].wide_runs==0 && deleveriesData[index].noball_runs==0){
-                            balls[deleveriesData[index].bowler]++;
-                       // }
-                    }
-                    //  console.log(runConceded);
-                    //  console.log(balls);
-                }
-            }
-            let economy ={};
-            for (let bowler in runConceded) {
-                economy[bowler] = (runConceded[bowler] / balls[bowler]) * 6;
-            }
-            let economyArray = [];
-            for (let bowler in economy) {
-                economyArray.push([bowler, economy[bowler]]);
-            }
+    const idSet = matchData
+      .filter(match => match.season === "2015")
+      .map(match => match.id);
 
-            for (let index1 = 0; index1 < economyArray.length - 1; index1++) {
-                for (let index2 = index1+1; index2 < economyArray.length; index2++) {
-                    if (economyArray[index1][1] > economyArray[index2][1]) {
-                        let temp = economyArray[index1];
-                        economyArray[index1] = economyArray[index2];
-                        economyArray[index2] = temp;
-                    }
-                }
-            }
+    const deliveriesData = csvTOJSON(deliveriesFilePath);
 
-            let top10EconomicBowlers = economyArray.slice(0, 10);
-            
-            fs.writeFileSync(filepath,JSON.stringify(top10EconomicBowlers, null, 2),
-            (err) => {
-              if (err) {
-                console.log(err, "Error writing the file");
-              } else {
-                console.log("Result written in the output");
-            }
-            }
-          );
+    const bowlerStats = deliveriesData.reduce((stats, delivery) => {
+      if (idSet.includes(delivery.match_id)) {
+        const bowler = delivery.bowler;
+        const runs = parseInt(delivery.batsman_runs) + parseInt(delivery.wide_runs) + parseInt(delivery.noball_runs);
+        stats[bowler] = stats[bowler] || { runs: 0, balls: 0 };
+        stats[bowler].runs += runs;
+        stats[bowler].balls++;
+      }
+      return stats;
+    }, {});
+
+    const economy = Object.keys(bowlerStats).reduce((economy, bowler) => {
+      economy[bowler] = (bowlerStats[bowler].runs / bowlerStats[bowler].balls) * 6;
+      return economy;
+    }, {});
+
+    const economyArray = Object.entries(economy).sort((a, b) => a[1] - b[1]);
+    const top10EconomicBowlers = economyArray.slice(0, 10);
+
+  fs.writeFileSync(
+    filepath,
+    JSON.stringify(top10EconomicBowlers, null, 2),
+    (err) => {
+      if (err) {
+        console.log(err, "Error writing the file");
+      } else {
+        console.log("Result written in the output");
+      }
+    }
+  );
 }
 
 top10EconomicBowlersIn2015();

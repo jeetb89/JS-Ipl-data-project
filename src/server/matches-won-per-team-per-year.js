@@ -3,38 +3,25 @@
 const fs = require("fs");
 const csvToJson = require("../util.js");
 
-
 const csvFilePath = "../data/matches.csv";
 
 const filePath = "../public/output/matchesWonPerTeamPerYear.json";
 
- function matches_won_per_team_per_year(csvFilePath) {
+function matches_won_per_team_per_year(csvFilePath) {
   try {
-    const obj =  csvToJson(csvFilePath);
-    const matchesWon = {};
+    const obj = csvToJson(csvFilePath);
+    const matchesWon = obj.reduce((accumulator, record) => {
+      const { winner, season } = record;
+
+      if (winner) {
+        accumulator[winner] = accumulator[winner] || {};
+        accumulator[winner][season] = (accumulator[winner][season] || 0) + 1;
+      }
+
+      return accumulator;
+    }, {});
     
-   
-    for (let record of obj) {
-        const { winner, season } = record;
-
-        if (winner) {
-            if (matchesWon[winner]) {
-                if (matchesWon[winner][season]) {
-                    matchesWon[winner][season]++;
-                } else {
-                    matchesWon[winner][season] = 1;
-                }
-            } else {
-                matchesWon[winner] = { [season]: 1 };
-            }
-        }
-    }
-
-    
-
-
-
-    const data = JSON.stringify(matchesWon,null,2);
+    const data = JSON.stringify(matchesWon, null, 2);
     fs.writeFileSync(filePath, data, (err) => {
       if (err) {
         console.error("Error writing file:", err);
