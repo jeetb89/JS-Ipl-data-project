@@ -47,4 +47,5 @@ function top10EconomicBowlersIn2015() {
   );
 }
 
+
 top10EconomicBowlersIn2015();
