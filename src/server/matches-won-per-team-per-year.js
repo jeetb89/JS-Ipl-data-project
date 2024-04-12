@@ -47,4 +47,5 @@ const filePath = "../public/output/matchesWonPerTeamPerYear.json";
   }
 }
 
+
 matches_won_per_team_per_year(csvFilePath);
