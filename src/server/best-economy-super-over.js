@@ -3,7 +3,6 @@ const csvToJson = require("../util.js");
 
 const path = "../data/deliveries.csv";
 
-const csvFilePath = "../data/matches.csv";
 const filePath = "../public/output/bestEconomySuperOver.json";
 
 function findBestSuperOverEconomy() {
