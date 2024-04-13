@@ -5,6 +5,7 @@ const matchesFilepath = "../data/matches.csv";
 const filePath = "../public/output/highestMomPerSeason.json";
 
 function highestTimePOTMAwardEachSeason() {
+try{
   const matchData = csvTOJSON(matchesFilepath);
  
 
@@ -53,6 +54,9 @@ function highestTimePOTMAwardEachSeason() {
       }
     }
   );
+ }catch(error){
+   console.error('Error is :',error.message);
+ }
 }
 
 
