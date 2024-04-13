@@ -6,7 +6,7 @@ const deliveriesFilepath = "../data/deliveries.csv"
 const filepath="../public/output/top10EconomicalBowlers.json"
 
 function top10EconomicBowlersIn2015(){
-
+   try{
     const matchData=csvTOJSON(matchesFilePath);
 
    
@@ -69,6 +69,9 @@ function top10EconomicBowlersIn2015(){
             }
             }
           );
+   }catch(error){
+       console.error('Error is :',error.message);
+   }
 }
 
 top10EconomicBowlersIn2015();
