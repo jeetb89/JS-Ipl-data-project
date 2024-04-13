@@ -6,7 +6,7 @@ const deliveriesFilePath = "../data/deliveries.csv";
 const filepath = "../public/output/top10EconomicalBowlers.json";
 
 function top10EconomicBowlersIn2015() {
-
+try{
   const matchData = csvTOJSON(matchesFilePath);
 
     const idSet = matchData
@@ -44,7 +44,11 @@ function top10EconomicBowlersIn2015() {
         console.log("Result written in the output");
       }
     }
+    
   );
+ }catch(error){
+   console.error('Error is :',error.message);
+ }
 }
 
 
