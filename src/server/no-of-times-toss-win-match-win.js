@@ -4,6 +4,7 @@ const fs = require("fs");
 const matchesFilePath = "../data/matches.csv";
 
 function teamWonTossAndMatch() {
+  try{
   function findTeamWins(data) {
     return data.reduce((tossAndMatchWins, entry) => {
       tossAndMatchWins[entry["toss_winner"]] = (tossAndMatchWins[entry["toss_winner"]] || 0) + 1;
@@ -23,6 +24,9 @@ function teamWonTossAndMatch() {
     "../public/output/teamWonTheTossAndMatch.json",
     JSON.stringify(tossAndMatchWins, null, 2)
   );
+  }catch(error){
+    console.error('Error is:',error.message);
+  }
 }
 
 
